@@ -1,0 +1,48 @@
+{#
+    Componente reutilizável que representa um único evento na página inicial.
+    Ele é incluído por index.html dentro de um laço, portanto a variável
+    ``event`` já corresponde ao evento do cartão atual.
+#}
+
+{# Valores calculados apenas para facilitar as decisões visuais do cartão. #}
+{% set remaining = event.capacity - event.registered %}
+{% set percentage = (event.registered / event.capacity * 100) if event.capacity else 0 %}
+
+<article class="event-card">
+    {# Bloco compacto da data, com dia e abreviação do mês. #}
+    <div class="event-date">
+        <span class="day">{{ event.day }}</span>
+        <span class="month">{{ event.month }}</span>
+    </div>
+    <div class="event-info">
+        <span class="event-type">{{ event.type }}</span>
+        <h3>{{ event.title }}</h3>
+        <div class="event-details">
+            <span>📅 {{ event.date }}</span>
+            <span>📍 {{ event.location }}</span>
+        </div>
+        {# Mostra contador, barra de ocupação e quantidade ainda disponível. #}
+        <div class="vacancy">
+            <div class="vacancy-header">
+                <span>Vagas disponíveis</span>
+                <strong>{{ event.registered }}/{{ event.capacity }}</strong>
+            </div>
+            <div class="progress">
+                {# A classe full muda a cor quando todas as vagas foram usadas. #}
+                <div class="progress-bar {% if remaining == 0 %}full{% endif %}"
+                     style="width: {{ percentage }}%;"></div>
+            </div>
+            <span class="vacancy-text {% if remaining == 0 %}full-text{% endif %}">
+                {% if remaining > 0 %}{{ remaining }} vagas restantes{% else %}Evento lotado{% endif %}
+            </span>
+        </div>
+        {# Um evento lotado exibe botão desativado e não permite avançar. #}
+        {% if remaining > 0 %}
+            <a href="{{ url_for('evento', event_id=event.id) }}" class="btn btn-primary btn-full">
+                Ver evento
+            </a>
+        {% else %}
+            <button class="btn btn-disabled btn-full" disabled>Evento lotado</button>
+        {% endif %}
+    </div>
+</article>

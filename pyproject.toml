@@ -1,0 +1,28 @@
+# Informações gerais que identificam o projeto para o Python e para o uv.
+[project]
+name = "eventosuni"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+
+# Bibliotecas usadas pela aplicação. Flask é o framework web; as demais são
+# dependências que dão suporte ao Flask, às rotas e aos templates Jinja.
+dependencies = [
+    "blinker==1.9.0",
+    "click==8.5.0",
+    "flask==3.1.3",
+    "itsdangerous==2.2.0",
+    "jinja2==3.1.6",
+    "markupsafe==3.0.3",
+    "werkzeug==3.1.8",
+]
+
+# Ferramenta responsável por preparar uma versão instalável do projeto.
+[build-system]
+requires = ["uv_build>=0.12.7,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+# Os módulos Python estão diretamente na raiz configurada do projeto.
+module-root = ""

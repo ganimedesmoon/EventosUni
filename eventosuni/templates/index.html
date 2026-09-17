@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+{#
+    Página inicial do EventosUni.
+    Este é um template Jinja: trechos entre {{ }} exibem valores enviados pelo
+    Flask, enquanto comandos entre {% %} controlam repetições e inclusões.
+#}
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventosUni - Eventos Acadêmicos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+    <!-- Cabeçalho compartilhado visualmente pelas páginas do sistema. -->
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo">
+                <span class="logo-icon"></span>
+                <div>
+                    <h1>EventosUni</h1>
+                    <p>Eventos acadêmicos</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo principal: apresentação do sistema e catálogo de eventos. -->
+    <main class="container">
+
+        <!-- Área de destaque com uma explicação e o acesso ao cadastro. -->
+        <section class="hero">
+            <div>
+                <span class="tag">EVENTOS DA FACULDADE</span>
+                <h2>Participe dos próximos eventos</h2>
+                <p>
+                    Encontre palestras, workshops e outros eventos
+                    acadêmicos disponíveis para inscrição. Apenas eventos disponíveis aparecerão.
+                </p>
+            </div>
+
+            <!-- url_for cria o endereço a partir do nome da função em app.py. -->
+            <a href="{{ url_for('cadastrar') }}" class="btn btn-primary">
+                + Cadastrar evento
+            </a>
+        </section>
+
+        <!-- Lista construída com os eventos recebidos pela rota index. -->
+        <section class="events-section">
+
+            <div class="section-title">
+                <div>
+                    <h2>Eventos disponíveis</h2>
+                    <p>Confira os eventos e garanta sua vaga.</p>
+                </div>
+
+                <!-- O filtro length do Jinja conta os itens da lista. -->
+                <span class="event-count">{{ events|length }} eventos</span>
+            </div>
+
+            <div class="events-grid">
+                <!-- Repete o cartão parcial para cada evento disponível. -->
+                {% for event in events %}
+                    {% include "_event_card.html" %}
+                {% endfor %}    
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Rodapé informativo exibido ao final da página. -->
+    <footer>
+        <p>EventosUni © 2026</p>
+        <span>Sistema de eventos acadêmicos</span>
+    </footer>
+
+</body>
+
+</html>

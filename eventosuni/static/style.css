@@ -1,0 +1,859 @@
+/*
+   Folha de estilos compartilhada por todas as páginas do EventosUni.
+   Uma classe escrita no HTML, como class="btn", recebe aqui sua aparência.
+   As regras foram agrupadas por componente para facilitar a localização.
+*/
+
+/*
+   AJUSTES GLOBAIS
+   Remove espaçamentos automáticos do navegador e faz largura e altura incluírem
+   bordas e preenchimentos. Isso deixa o tamanho dos elementos mais previsível.
+*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    /* Define a identidade visual básica usada como padrão em toda a página. */
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f7fb;
+    color: #172033;
+    line-height: 1.5;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button {
+    font-family: inherit;
+}
+
+.container {
+    /* Centraliza o conteúdo e evita linhas excessivamente largas em telas grandes. */
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+
+/* ================================
+   HEADER
+================================ */
+
+/* Cabeçalho branco que contém a marca e fica separado do corpo por uma borda. */
+
+.header {
+    background: #ffffff;
+    border-bottom: 1px solid #e6e9ef;
+}
+
+.header-content {
+    height: 80px;
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    /* Flex coloca ícone e textos lado a lado e centralizados verticalmente. */
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 42px;
+    height: 42px;
+    background: #cb6006;
+    color: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.logo h1 {
+    font-size: 20px;
+    color: #172033;
+}
+
+.logo p {
+    color: #7b8496;
+    font-size: 12px;
+}
+
+
+/* ================================
+   HERO
+================================ */
+
+/* Primeira área da página inicial, com chamada à esquerda e ação à direita. */
+
+.hero {
+    margin: 50px 0 45px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+}
+
+.tag {
+    display: inline-block;
+    background: #eaf1ff;
+    color: #004372;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.hero h2 {
+    margin-top: 12px;
+    font-size: 34px;
+    line-height: 1.2;
+}
+
+.hero p {
+    margin-top: 10px;
+    color: #697386;
+    max-width: 600px;
+}
+
+
+/* ================================
+   BUTTONS
+================================ */
+
+/*
+   .btn reúne o formato comum. As classes primary, secondary e disabled mudam
+   a função visual de cada botão sem repetir todas as propriedades.
+*/
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-primary {
+    background: #004372;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #004372;
+}
+
+.btn-disabled {
+    background: #e5e7eb;
+    color: #8a93a3;
+    cursor: not-allowed;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+
+/* ================================
+   SECTION
+================================ */
+
+/* Cabeçalho da listagem, incluindo título, explicação e contador de eventos. */
+
+.events-section {
+    margin-bottom: 70px;
+}
+
+.section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 22px;
+}
+
+.section-title h2 {
+    font-size: 22px;
+}
+
+.section-title p {
+    color: #7b8496;
+    margin-top: 4px;
+    font-size: 14px;
+}
+
+.event-count {
+    background: #ffffff;
+    border: 1px solid #e2e6ed;
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #697386;
+}
+
+
+/* ================================
+   EVENT CARDS
+================================ */
+
+/* Grade e cartões repetidos pelo template _event_card.html na página inicial. */
+
+.events-grid {
+    /* Duas colunas em telas amplas; as media queries reduzem para uma coluna. */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+}
+
+.event-card {
+    /* Flex organiza o bloco de data ao lado das demais informações do evento. */
+    background: #ffffff;
+    border: 1px solid #e4e8ef;
+    border-radius: 12px;
+    padding: 22px;
+    display: flex;
+    gap: 20px;
+    box-shadow: 0 3px 12px rgba(20, 30, 50, 0.04);
+}
+
+.event-date {
+    width: 60px;
+    height: 70px;
+    flex-shrink: 0;
+    border-radius: 9px;
+    background: #eff5ff;
+    color: #004372;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.event-date .day {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.event-date .month {
+    font-size: 11px;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.event-info {
+    flex: 1;
+}
+
+.event-type {
+    color: #004372;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.event-info h3 {
+    margin: 5px 0 12px;
+    font-size: 19px;
+}
+
+.event-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: #6b7485;
+    font-size: 13px;
+}
+
+.vacancy {
+    margin: 20px 0;
+}
+
+.vacancy-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 7px;
+    color: #6b7485;
+    font-size: 12px;
+}
+
+.vacancy-header strong {
+    color: #172033;
+}
+
+.progress {
+    /* Trilho cinza que limita visualmente a barra colorida de ocupação. */
+    width: 100%;
+    height: 7px;
+    background: #e9edf3;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    /* A largura é calculada no template de acordo com a ocupação do evento. */
+    height: 100%;
+    background: #004372;
+    border-radius: 20px;
+}
+
+.progress-bar.full {
+    background: #ef4444;
+}
+
+.vacancy-text {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #6b7485;
+}
+
+.full-text {
+    color: #ef4444;
+}
+
+
+/* ================================
+   EVENT PAGE
+================================ */
+
+/* Estrutura principal da página de detalhes: conteúdo e painel lateral. */
+
+.back-link {
+    display: inline-block;
+    margin: 35px 0 20px;
+    color: #004372;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.event-page {
+    /* A primeira coluna cresce; a segunda mantém 330 px para o painel de vagas. */
+    background: white;
+    border: 1px solid #e4e8ef;
+    border-radius: 14px;
+    padding: 35px;
+    display: grid;
+    grid-template-columns: 1fr 330px;
+    gap: 50px;
+}
+
+.event-main h2 {
+    font-size: 34px;
+    margin-top: 8px;
+}
+
+.event-description {
+    color: #697386;
+    margin-top: 15px;
+    max-width: 650px;
+}
+
+.event-meta {
+    display: flex;
+    gap: 45px;
+    margin-top: 35px;
+}
+
+.meta-item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.meta-icon {
+    font-size: 24px;
+}
+
+.meta-item small {
+    display: block;
+    color: #8991a1;
+    font-size: 11px;
+}
+
+.meta-item strong {
+    display: block;
+    margin-top: 2px;
+    font-size: 14px;
+}
+
+
+/* ================================
+   SIDEBAR
+================================ */
+
+/* Painel de destaque que resume vagas e oferece a ação de inscrição. */
+
+.event-sidebar {
+    background: #f8faff;
+    border: 1px solid #dfe8fb;
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.event-sidebar h3 {
+    font-size: 16px;
+}
+
+.big-number {
+    margin-top: 12px;
+    font-size: 40px;
+    font-weight: bold;
+    color: #2563eb;
+}
+
+.big-number span {
+    color: #9aa2b1;
+    font-size: 20px;
+}
+
+.available {
+    color: #697386;
+    font-size: 13px;
+}
+
+.event-sidebar .progress {
+    margin: 20px 0;
+}
+
+.occupancy {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #697386;
+}
+
+.occupancy strong {
+    color: #172033;
+}
+
+
+/* ================================
+   PARTICIPANTS
+================================ */
+
+/* Lista de pessoas inscritas, apresentada abaixo dos detalhes do evento. */
+
+.participants-section {
+    margin: 45px 0 70px;
+}
+
+.participants-list {
+    /* Se houver muitos nomes, apenas esta caixa ganha rolagem vertical. */
+    background: white;
+    border: 1px solid #e4e8ef;
+    border-radius: 12px;
+    overflow: hidden;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+.participant {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.participant:last-child {
+    border-bottom: none;
+}
+
+.avatar {
+    /* Círculo que recebe as iniciais calculadas pelo template evento.html. */
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #eaf1ff;
+    color: #cb6005;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.participant strong {
+    display: block;
+    font-size: 14px;
+}
+
+.participant span {
+    display: block;
+    margin-top: 2px;
+    color: #7b8496;
+    font-size: 12px;
+}
+
+
+/* ================================
+   FOOTER
+================================ */
+
+/* Rodapé simples e centralizado, comum a todas as telas. */
+
+footer {
+    background: #ffffff;
+    border-top: 1px solid #e5e8ee;
+    padding: 25px;
+    text-align: center;
+    color: #697386;
+    font-size: 13px;
+}
+
+footer span {
+    display: block;
+    margin-top: 4px;
+    color: #9aa2b1;
+    font-size: 11px;
+}
+
+
+/* ================================
+   FORMULÁRIOS
+================================ */
+
+/* Cartão e cabeçalho usados tanto no cadastro quanto na inscrição. */
+.form-page {
+    max-width: 750px;
+    margin: 35px auto 70px;
+    background: #ffffff;
+    border: 1px solid #e4e8ef;
+    border-radius: 14px;
+    padding: 40px;
+    box-shadow: 0 3px 12px rgba(20, 30, 50, 0.04);
+}
+
+.form-header {
+    margin-bottom: 30px;
+}
+
+.form-header h2 {
+    font-size: 30px;
+    margin-top: 8px;
+}
+
+.form-header p {
+    color: #697386;
+    margin-top: 8px;
+    font-size: 14px;
+}
+
+
+/* ================================
+   EVENTO SELECIONADO
+================================ */
+
+/* Resumo do evento exibido antes dos campos do formulário de inscrição. */
+.selected-event {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #f5f8ff;
+    border: 1px solid #dfe8fb;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 30px;
+}
+
+.selected-event-icon {
+    width: 45px;
+    height: 45px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e7efff;
+    border-radius: 9px;
+    font-size: 20px;
+}
+
+.selected-event span {
+    display: block;
+    color: #7b8496;
+    font-size: 11px;
+    margin-bottom: 2px;
+}
+
+.selected-event h3 {
+    font-size: 16px;
+}
+
+.selected-event p {
+    margin-top: 3px;
+    color: #697386;
+    font-size: 12px;
+}
+
+
+/* ================================
+   FORM
+================================ */
+
+/* Organização comum dos campos, rótulos, entradas e mensagens de ajuda. */
+.form {
+    /* Os campos são empilhados com distância constante entre eles. */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: bold;
+    color: #30394b;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 13px;
+    border: 1px solid #d9dee7;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #172033;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    /* O destaque indica claramente qual campo está recebendo a digitação. */
+    border-color: #004372;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #a2a9b5;
+}
+
+.input-help {
+    color: #8a93a3;
+    font-size: 11px;
+}
+
+
+/* ================================
+   DUAS COLUNAS
+================================ */
+
+/* Aproxima campos relacionados, como data e tipo, usando duas colunas. */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+
+/* ================================
+   REGRA DE INSCRIÇÃO
+================================ */
+
+/* Caixa verde para apresentar uma condição importante antes da confirmação. */
+.form-rule {
+    display: flex;
+    gap: 12px;
+    padding: 15px;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 9px;
+}
+
+.rule-icon {
+    width: 25px;
+    height: 25px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #22c55e;
+    color: white;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.form-rule strong {
+    display: block;
+    color: #166534;
+    font-size: 13px;
+}
+
+.form-rule p {
+    margin-top: 3px;
+    color: #4b6352;
+    font-size: 12px;
+}
+
+
+/* ================================
+   INFORMAÇÃO
+================================ */
+
+/* Caixa azul que explica o controle automático de vagas no cadastro. */
+.form-info {
+    display: flex;
+    gap: 12px;
+    padding: 15px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 9px;
+}
+
+.info-icon {
+    width: 25px;
+    height: 25px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #004372;
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.form-info strong {
+    display: block;
+    color: #004372;
+    font-size: 13px;
+}
+
+.form-info p {
+    margin-top: 3px;
+    color: #4b6285;
+    font-size: 12px;
+}
+
+
+/* ================================
+   BOTÕES DO FORMULÁRIO
+================================ */
+
+/* Agrupa cancelar e confirmar no fim e separa essas ações dos campos. */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #edf0f4;
+}
+
+.btn-secondary {
+    background: #ffffff;
+    color: #4b5563;
+    border: 1px solid #d9dee7;
+}
+
+.btn-secondary:hover {
+    background: #f5f7fb;
+}
+
+
+/* ================================
+   RESPONSIVIDADE
+================================ */
+
+/*
+   As media queries abaixo aplicam ajustes somente em larguras menores. Assim,
+   o mesmo HTML continua legível em computador, tablet e celular.
+*/
+@media (max-width: 800px) {
+
+    /* Em tablets, áreas com várias colunas passam a ser empilhadas. */
+
+    .hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .events-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .event-page {
+        grid-template-columns: 1fr;
+    }
+
+    .event-meta {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    /* Em celulares, formulários usam menos espaço e botões ocupam toda a linha. */
+
+    .form-page {
+        padding: 25px 20px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .form-actions .btn {
+        width: 100%;
+    }
+
+    .selected-event {
+        align-items: flex-start;
+    }
+}
+
+
+@media (max-width: 500px) {
+
+    /* Ajustes finais para títulos, cartões e cabeçalhos em telas bem estreitas. */
+
+    .hero h2 {
+        font-size: 28px;
+    }
+
+    .event-card {
+        flex-direction: column;
+    }
+
+    .event-date {
+        width: 60px;
+    }
+
+    .section-title {
+        align-items: flex-start;
+        gap: 10px;
+        flex-direction: column;
+    }
+}

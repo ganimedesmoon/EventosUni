@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<!--
+    Formulário de cadastro de evento.
+    Os atributos "name" dos campos são as chaves que app.py usa para recuperar
+    os valores enviados por meio de request.form.
+-->
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Evento - EventosUni</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <!-- Cabeçalho de identificação do EventosUni. -->
+    <header class="header">
+        <div class="container header-content">
+
+            <div class="logo">
+                <span class="logo-icon">E</span>
+
+                <div>
+                    <h1>EventosUni</h1>
+                    <p>Eventos acadêmicos</p>
+                </div>
+
+            </div>
+
+        </div>
+    </header>
+
+
+    <main class="container">
+
+        <!-- Navegação segura de volta à página inicial. -->
+        <a href="{{ url_for('index') }}" class="back-link">
+            ← Voltar para eventos
+        </a>
+
+
+        <!-- Cartão central que reúne a apresentação e o formulário. -->
+        <section class="form-page">
+
+            <div class="form-header">
+
+                <span class="event-type">
+                    NOVO EVENTO
+                </span>
+
+                <h2>Cadastrar evento</h2>
+
+                <p>
+                    Preencha as informações abaixo para cadastrar
+                    um novo evento acadêmico.
+                </p>
+
+            </div>
+
+
+            <!--
+                POST envia os dados sem colocá-los na URL. A action aponta para
+                a mesma rota que valida e cadastra o novo evento em app.py.
+            -->
+            <form class="form" method="post" action="{{ url_for('cadastrar') }}">
+
+                <!-- Título pelo qual o evento aparecerá no catálogo. -->
+                <div class="form-group">
+
+                    <label for="nome-evento">
+                        Nome do evento
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nome-evento"
+                        name="nome"
+                        placeholder="Ex.: Workshop de Python"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- Em telas largas, data e tipo ficam lado a lado. -->
+                <div class="form-row">
+
+                    <div class="form-group">
+
+                        <label for="data">
+                            Data
+                        </label>
+
+                        <input
+                            type="date"
+                            id="data"
+                            name="data"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="tipo">
+                            Tipo de evento
+                        </label>
+
+                        <select
+                            id="tipo"
+                            name="tipo"
+                            required
+                        >
+
+                            <option value="">
+                                Selecione
+                            </option>
+
+                            <option value="palestra">
+                                Palestra
+                            </option>
+
+                            <option value="workshop">
+                                Workshop
+                            </option>
+
+                            <option value="curso">
+                                Curso
+                            </option>
+
+                            <option value="outro">
+                                Outro
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <!-- Local físico ou virtual em que o evento será realizado. -->
+                    <label for="local">
+                        Local
+                    </label>
+
+                    <input
+                        type="text"
+                        id="local"
+                        name="local"
+                        placeholder="Ex.: Auditório A"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <!-- Texto explicativo exibido na página de detalhes. -->
+                    <label for="descricao">
+                        Descrição
+                    </label>
+
+                    <textarea
+                        id="descricao"
+                        name="descricao"
+                        placeholder="Descreva o evento"
+                        required
+                    ></textarea>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <!-- Limite usado pelo sistema para aceitar ou recusar inscrições. -->
+                    <label for="vagas">
+                        Quantidade de vagas
+                    </label>
+
+                    <input
+                        type="number"
+                        id="vagas"
+                        name="vagas"
+                        min="1"
+                        placeholder="Ex.: 50"
+                        required
+                    >
+
+                    <small class="input-help">
+                        Informe o número máximo de participantes.
+                    </small>
+
+                </div>
+
+
+                <!-- Aviso ao usuário sobre a regra automática de capacidade. -->
+                <div class="form-info">
+
+                    <span class="info-icon">i</span>
+
+                    <div>
+
+                        <strong>
+                            Controle automático de vagas
+                        </strong>
+
+                        <p>
+                            O sistema controlará a quantidade de
+                            inscrições e impedirá novas inscrições
+                            quando o limite for atingido.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Cancelar não envia o formulário; o botão realiza o POST. -->
+                <div class="form-actions">
+
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                        Cancelar
+                    </a>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Cadastrar evento
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+    <!-- Rodapé institucional. -->
+    <footer>
+
+        <p>EventosUni © 2026</p>
+
+        <span>
+            Sistema de eventos acadêmicos
+        </span>
+
+    </footer>
+
+</body>
+</html>

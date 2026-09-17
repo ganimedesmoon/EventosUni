@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<!--
+    Formulário de inscrição de participante.
+    A rota fornece "event" para identificar o evento escolhido e recebe por
+    POST o nome, a matrícula e o curso informados pelo usuário.
+-->
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscrição - EventosUni</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <!-- Cabeçalho de identificação do sistema. -->
+    <header class="header">
+        <div class="container header-content">
+
+            <div class="logo">
+                <span class="logo-icon">E</span>
+
+                <div>
+                    <h1>EventosUni</h1>
+                    <p>Eventos acadêmicos</p>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+
+    <main class="container">
+
+        <!-- O ID preserva qual evento estava aberto antes deste formulário. -->
+        <a href="{{ url_for('evento', event_id=event.id) }}" class="back-link">
+            ← Voltar para o evento
+        </a>
+
+
+        <!-- Área central dedicada à inscrição. -->
+        <section class="form-page">
+
+            <div class="form-header">
+
+                <span class="event-type">INSCRIÇÃO</span>
+
+                <h2>Inscrever participante</h2>
+
+                <p>
+                    Preencha os dados abaixo para realizar a inscrição
+                    no evento.
+                </p>
+
+            </div>
+
+
+            <!-- Resumo para o usuário confirmar onde está se inscrevendo. -->
+            <div class="selected-event">
+
+                <div class="selected-event-icon">
+                    📚
+                </div>
+
+                <div>
+                    <span>Evento selecionado</span>
+
+                    <h3>{{ event.title }}</h3>
+
+                    <p>
+                        📅 {{ event.date }} &nbsp; • &nbsp;
+                        📍 {{ event.location }}
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!--
+                Envia os dados para a rota de inscrição junto com o ID do evento.
+                O servidor fará uma nova validação antes de salvar a pessoa.
+            -->
+            <form class="form" method="post" action="{{ url_for('inscricao', event_id=event.id) }}">
+
+                <!-- Nome usado para identificar a pessoa na lista do evento. -->
+                <div class="form-group">
+
+                    <label for="nome">
+                        Nome completo
+                    </label>
+
+                    <input type="text" id="nome" name="nome" placeholder="Digite o nome do participante" required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <!-- app.py confirma se a matrícula contém somente dígitos. -->
+                    <label for="matricula">
+                        Matrícula
+                    </label>
+
+                    <input type="text" id="matricula" name="matricula" placeholder="Digite a matrícula" required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <!-- A lista fechada evita variações desnecessárias nos cursos. -->
+                    <label for="curso">
+                        Curso
+                    </label>
+
+                    <select id="curso" name="curso" required>
+
+                        <option value="">
+                            Selecione o curso
+                        </option>
+
+                        <option value="Sistemas de Informação">
+                            Sistemas de Informação
+                        </option>
+
+                        <option value="Ciências da Computação">
+                            Ciência da Computação
+                        </option>
+
+                        <option value="Engenharia de Software">
+                            Engenharia de Software
+                        </option>
+
+                        <option value="outro">
+                            Outro
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Lembrete visual da condição exigida para participar. -->
+                <div class="form-rule">
+
+                    <span class="rule-icon">✓</span>
+
+                    <div>
+                        <strong>Regra de inscrição</strong>
+
+                        <p>
+                            Apenas alunos regularmente matriculados
+                            na faculdade podem participar dos eventos.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <!-- Cancelar volta ao evento; confirmar envia o formulário. -->
+                <div class="form-actions">
+
+                    <a href="{{ url_for('evento', event_id=event.id) }}" class="btn btn-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-primary">
+                        Confirmar inscrição
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </main>
+
+
+    <!-- Rodapé institucional. -->
+    <footer>
+
+        <p>EventosUni © 2026</p>
+
+        <span>
+            Sistema de eventos acadêmicos
+        </span>
+
+    </footer>
+
+</body>
+
+</html>
