@@ -1,108 +1,86 @@
-"""Camada responsável por consultar e alterar os dados simulados.
+"""
+Módulo DataManager (Gestão de Dados)
+------------------------------------
+Responsável por intermédiar o acesso e a manipulação dos dados armazenados 
+no banco em memória (mock_db).
 
-As rotas não acessam diretamente as listas do ``mock_db``. Elas usam o
-``DataManager``, concentrando neste arquivo as regras de acesso aos eventos e
-participantes. Em uma versão futura, esta classe poderia ser substituída por
-uma implementação que conversa com um banco de dados real.
+- Paradigma Imperativo: Controle de fluxo e modificações no estado em memória.
+- Paradigma OO: Manipulação de instâncias das classes Event e Participante.
 """
 
-from mock_db import EVENTS, MAP_EVENT_PARTICIPANT
+from typing import List, Optional
 from models.event import Event
-from models.participant import Participant
+from models.participant import Participante
+import mock_db
 
 
-class DataManager():
-    """Oferece operações simples sobre o banco de dados mantido em memória.
-
-    ORIENTAÇÃO A OBJETOS:
-    A classe agrupa operações relacionadas aos dados. Seus métodos são
-    estáticos porque não dependem de um objeto DataManager específico.
+class DataManager:
+    """
+    Classe de serviços estáticos para consulta e persistência temporária 
+    dos eventos e inscritos.
     """
 
     @staticmethod
-    def get_events():
-        """Retorna a lista de eventos que está disponível no mock database."""
-
-        return EVENTS
+    def get_events() -> List[Event]:
+        """Retorna a lista completa de eventos cadastrados."""
+        return mock_db.EVENTS
 
     @staticmethod
-    def get_event_by_id(event_id):
-        """Procura um evento pelo ID e retorna ``None`` quando não o encontra.
-
-        A expressão geradora examina os eventos um de cada vez. ``next`` para
-        assim que encontra o primeiro evento cujo ID corresponde ao solicitado.
+    def get_event_by_id(event_id: int) -> Optional[Event]:
         """
-
-        # PROGRAMAÇÃO FUNCIONAL:
-        # A expressão geradora descreve o filtro desejado sem criar uma lista
-        # intermediária. ``next`` devolve somente o primeiro resultado.
-        return next(
-            (event for event in EVENTS if event.id == event_id),
-            None
-        )
-
-    @staticmethod
-    def get_participants_of_event(event_id):
-        """Retorna os participantes de um evento ou uma lista vazia."""
-
-        return MAP_EVENT_PARTICIPANT.get(event_id, [])
-
-    @staticmethod
-    def add_participant(event_id, name, registry, major):
-        """Inscreve uma pessoa se o evento existe e ainda possui vaga.
-
-        O retorno booleano simplifica o uso na rota: ``True`` significa que a
-        inscrição ocorreu; ``False`` significa que ela precisou ser recusada.
+        Busca um evento pelo seu identificador único.
+        Retorna o objeto Event se encontrado ou None caso contrário.
         """
+        for event in mock_db.EVENTS:
+            if event.id == event_id:
+                return event
+        return None
 
-        # ORIENTAÇÃO A OBJETOS:
-        # Chamamos um método da classe e, mais abaixo, construímos um objeto da
-        # classe Participant para representar a pessoa inscrita.
+    @staticmethod
+    def get_participants_of_event(event_id: int) -> List[Participante]:
+        """Retorna a lista de participantes inscritos no evento informado."""
         event = DataManager.get_event_by_id(event_id)
-        participants = MAP_EVENT_PARTICIPANT.get(event_id)
-
-        # Um evento válido deve ter uma lista no mapa e uma vaga disponível.
-        if event is None or participants is None or event.registered >= event.capacity:
-            return False
-
-        # Os dois valores são atualizados juntos para a lista e o contador
-        # continuarem representando a mesma quantidade de inscritos.
-        # PROGRAMAÇÃO IMPERATIVA:
-        # append e += alteram estruturas já existentes. O estado depois dessas
-        # instruções é diferente do estado anterior.
-        participants.append(Participant(name=name, registry=registry, major=major))
-        event.registered += 1
-        return True
+        if event:
+            return event.inscritos
+        return []
 
     @staticmethod
-    def add_event(day, month, date, event_type, title, location, capacity, description):
-        """Cria um evento e prepara uma lista vazia para seus participantes."""
-
-        # O maior ID atual recebe mais um. ``default=0`` também permite cadastrar
-        # corretamente o primeiro evento caso a lista comece vazia.
-        # PROGRAMAÇÃO FUNCIONAL:
-        # A expressão geradora transforma cada evento em seu ID, e max reduz
-        # esses valores ao maior deles sem um laço manual com variável auxiliar.
-        event_id = max((event.id for event in EVENTS), default=0) + 1
-
-        # ORIENTAÇÃO A OBJETOS:
-        # Event(...) chama o construtor da classe e produz um novo objeto.
-        event = Event(
-            id=event_id,
+    def add_event(day: str, month: str, date: str, event_type: str, 
+                  title: str, location: str, capacity: int, description: str) -> Event:
+        """
+        PROGRAMAÇÃO IMPERATIVA & OO:
+        Cria um novo evento com ID incremental e adiciona à coleção global.
+        """
+        new_id = max([e.id for e in mock_db.EVENTS], default=0) + 1
+        
+        new_event = Event(
+            id=new_id,
             day=day,
             month=month,
             date=date,
-            type=event_type,
+            event_type=event_type,
             title=title,
             location=location,
-            registered=0,
             capacity=capacity,
             description=description,
+            inscritos=[]
         )
+        
+        mock_db.EVENTS.append(new_event)
+        mock_db.MAP_EVENT_PARTICIPANT[new_id] = new_event.inscritos
+        return new_event
 
-        # O evento entra na lista geral e ganha sua própria entrada no mapa.
-        # PROGRAMAÇÃO IMPERATIVA:
-        # As duas instruções abaixo alteram as coleções globais em memória.
-        EVENTS.append(event)
-        MAP_EVENT_PARTICIPANT[event_id] = []
-        return event
+    @staticmethod
+    def add_participant(event_id: int, participant: Participante) -> bool:
+        """
+        PROGRAMAÇÃO IMPERATIVA:
+        Verifica o limite de vagas disponíveis antes de alterar o estado.
+        Adiciona o participante e retorna True se a inscrição for realizada.
+        """
+        event = DataManager.get_event_by_id(event_id)
+        
+        if event and len(event.inscritos) < event.capacity:
+            event.inscritos.append(participant)
+            return True
+            
+        return False

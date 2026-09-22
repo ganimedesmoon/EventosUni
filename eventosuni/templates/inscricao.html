@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
     Formulário de inscrição de participante.
-    A rota fornece "event" para identificar o evento escolhido e recebe por
-    POST o nome, a matrícula e o curso informados pelo usuário.
+    A Rota '/inscricao/<id>' recebe por POST o nome, a matrícula e o curso do participante,
+    validando os dados com as regras do Paradigma Lógico e notificando caso ocorra um erro.
 -->
 <html lang="pt-BR">
 
@@ -34,7 +34,7 @@
 
     <main class="container">
 
-        <!-- O ID preserva qual evento estava aberto antes deste formulário. -->
+        <!-- Voltar para o evento. -->
         <a href="{{ url_for('evento', event_id=event.id) }}" class="back-link">
             ← Voltar para o evento
         </a>
@@ -57,7 +57,7 @@
             </div>
 
 
-            <!-- Resumo para o usuário confirmar onde está se inscrevendo. -->
+            <!-- Resumo do evento selecionado. -->
             <div class="selected-event">
 
                 <div class="selected-event-icon">
@@ -78,44 +78,90 @@
             </div>
 
 
-            <!--
-                Envia os dados para a rota de inscrição junto com o ID do evento.
-                O servidor fará uma nova validação antes de salvar a pessoa.
-            -->
+            <!-- BLOCO DE EXIBIÇÃO DE ERROS DA VALIDAÇÃO LÓGICA -->
+            {% if error %}
+                <div style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; padding: 14px 16px; border-radius: 8px; margin-bottom: 24px; font-weight: 500; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1.2rem;">⚠️</span>
+                    <div>{{ error }}</div>
+                </div>
+            {% endif %}
+
+
+            <!-- Formulário de inscrição simplificado -->
             <form class="form" method="post" action="{{ url_for('inscricao', event_id=event.id) }}">
 
-                <!-- Nome usado para identificar a pessoa na lista do evento. -->
+                <!-- Nome completo -->
                 <div class="form-group">
 
                     <label for="nome">
                         Nome completo
                     </label>
 
-                    <input type="text" id="nome" name="nome" placeholder="Digite o nome do participante" required>
+                    <input type="text" id="nome" name="nome" placeholder="Digite o nome do participante" required
+                        value="{{ request.form.get('nome', '') }}">
 
                 </div>
 
 
-                <div class="form-group">
+                <!-- Vínculo e idade lado a lado, definem qual regra de elegibilidade se aplica. -->
+                <div class="form-row">
 
-                    <!-- app.py confirma se a matrícula contém somente dígitos. -->
+                    <div class="form-group">
+
+                        <label for="vinculo">
+                            Vínculo
+                        </label>
+
+                        <select id="vinculo" name="vinculo" required onchange="atualizarCamposPorVinculo()">
+
+                            <option value="">Selecione</option>
+                            <option value="estudante" {% if request.form.get('vinculo') == 'estudante' %}selected{% endif %}>Estudante</option>
+                            <option value="professor" {% if request.form.get('vinculo') == 'professor' %}selected{% endif %}>Professor</option>
+                            <option value="comunidade" {% if request.form.get('vinculo') == 'comunidade' %}selected{% endif %}>Comunidade externa</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="idade">
+                            Idade
+                        </label>
+
+                        <input type="number" id="idade" name="idade" min="1" placeholder="Ex.: 20" required
+                            value="{{ request.form.get('idade', '') }}">
+
+                    </div>
+
+                </div>
+
+
+                <!-- Matrícula: obrigatória para estudante/professor, dispensada para comunidade externa. -->
+                <div class="form-group" id="grupo-matricula">
+
                     <label for="matricula">
                         Matrícula
                     </label>
 
-                    <input type="text" id="matricula" name="matricula" placeholder="Digite a matrícula" required>
+                    <input type="text" id="matricula" name="matricula" placeholder="Digite a matrícula" required
+                        value="{{ request.form.get('matricula', '') }}">
+
+                    <small class="input-help" id="ajuda-matricula">
+                        Obrigatória para estudantes e professores com matrícula ativa na instituição.
+                    </small>
 
                 </div>
 
 
-                <div class="form-group">
+                <!-- Curso / Área: relevante apenas para estudantes e professores vinculados. -->
+                <div class="form-group" id="grupo-curso">
 
-                    <!-- A lista fechada evita variações desnecessárias nos cursos. -->
                     <label for="curso">
-                        Curso
+                        Curso / Área
                     </label>
 
-                    <select id="curso" name="curso" required>
+                    <select id="curso" name="curso">
 
                         <option value="">
                             Selecione o curso
@@ -133,7 +179,7 @@
                             Engenharia de Software
                         </option>
 
-                        <option value="outro">
+                        <option value="Outro">
                             Outro
                         </option>
 
@@ -142,7 +188,7 @@
                 </div>
 
 
-                <!-- Lembrete visual da condição exigida para participar. -->
+                <!-- Regra informativa -->
                 <div class="form-rule">
 
                     <span class="rule-icon">✓</span>
@@ -151,15 +197,16 @@
                         <strong>Regra de inscrição</strong>
 
                         <p>
-                            Apenas alunos regularmente matriculados
-                            na faculdade podem participar dos eventos.
+                            Estudantes e professores precisam de matrícula ativa e válida na
+                            instituição. Participantes da comunidade externa (sem matrícula)
+                            podem se inscrever a partir de 18 anos.
                         </p>
                     </div>
 
                 </div>
 
 
-                <!-- Cancelar volta ao evento; confirmar envia o formulário. -->
+                <!-- Botões de ação -->
                 <div class="form-actions">
 
                     <a href="{{ url_for('evento', event_id=event.id) }}" class="btn btn-secondary">
@@ -189,6 +236,36 @@
         </span>
 
     </footer>
+
+
+    <!--
+        Mostra/oculta e alterna o atributo "required" da Matrícula conforme o
+        Vínculo escolhido, já que a regra de "comunidade" (Paradigma Lógico)
+        dispensa a matrícula, exigindo apenas idade mínima.
+    -->
+    <script>
+        function atualizarCamposPorVinculo() {
+            const vinculo = document.getElementById('vinculo').value;
+            const grupoMatricula = document.getElementById('grupo-matricula');
+            const campoMatricula = document.getElementById('matricula');
+            const ajudaMatricula = document.getElementById('ajuda-matricula');
+            const grupoCurso = document.getElementById('grupo-curso');
+
+            const ehComunidade = vinculo === 'comunidade';
+
+            grupoMatricula.style.display = ehComunidade ? 'none' : '';
+            campoMatricula.required = !ehComunidade;
+            if (ehComunidade) {
+                campoMatricula.value = '';
+            }
+
+            grupoCurso.style.display = ehComunidade ? 'none' : '';
+
+            ajudaMatricula.textContent = 'Obrigatória para estudantes e professores com matrícula ativa na instituição.';
+        }
+
+        document.addEventListener('DOMContentLoaded', atualizarCamposPorVinculo);
+    </script>
 
 </body>
 

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
-    Página de detalhes de um evento.
-    A rota /evento/<id> fornece as variáveis "event" e "participants", usadas
-    para montar os dados do evento e a relação atual de pessoas inscritas.
+    Página de Detalhes do Evento.
+    Exibe as informações do evento e a lista de participantes inscritos,
+    utilizando as propriedades do Modelo OO (p.name, p.registry, p.major).
 -->
 <html lang="pt-BR">
 
@@ -15,126 +15,117 @@
 
 <body>
 
-    <!-- Identificação visual do sistema. -->
+    <!-- Cabeçalho de identificação do sistema. -->
     <header class="header">
         <div class="container header-content">
+
             <div class="logo">
                 <span class="logo-icon">E</span>
+
                 <div>
                     <h1>EventosUni</h1>
                     <p>Eventos acadêmicos</p>
                 </div>
             </div>
+
         </div>
     </header>
 
+
     <main class="container">
 
-        <!-- Retorna ao catálogo sem depender de um endereço escrito à mão. -->
+        <!-- Voltar para a listagem principal -->
         <a href="{{ url_for('index') }}" class="back-link">
-            ← Voltar para eventos
+            ← Voltar para todos os eventos
         </a>
 
-        <!-- Divide a página entre informações principais e controle de vagas. -->
-        <section class="event-page">
 
-            <!-- Nome, descrição, data e local do evento selecionado. -->
-            <div class="event-main">
+        <!-- Detalhes do Evento -->
+        <section class="event-detail-card">
 
-                <span class="event-type">{{ event.type }}</span>
-
+            <div class="event-detail-header">
+                <span class="event-type">{{ event.event_type }}</span>
                 <h2>{{ event.title }}</h2>
-
-                <p class="event-description">
-                    {{event.description}}
-                </p>
-
-                <div class="event-meta">
-
-                    <div class="meta-item">
-                        <span class="meta-icon">📅</span>
-                        <div>
-                            <small>Data</small>
-                            <strong>{{ event.date }}</strong>
-                        </div>
-                    </div>
-
-                    <div class="meta-item">
-                        <span class="meta-icon">📍</span>
-                        <div>
-                            <small>Local</small>
-                            <strong>{{ event.location }}</strong>
-                        </div>
-                    </div>
-
-                </div>
-
+                <p class="event-description">{{ event.description }}</p>
             </div>
 
-
-            <!-- Painel lateral com ocupação e acesso ao formulário de inscrição. -->
-            <aside class="event-sidebar">
-
-                <h3>Vagas</h3>
-
-                <div class="big-number">
-                    {{ event.registered }} <span>/ {{ event.capacity }}</span>
+            <div class="event-info-grid">
+                <div class="info-item">
+                    <span class="info-label">📅 Data</span>
+                    <span class="info-value">{{ event.date }}</span>
                 </div>
 
-                <p class="available">
-                    {{ event.capacity - event.registered }} vagas disponíveis
-                </p>
-
-                <!-- A largura percentual transforma a ocupação em uma barra visual. -->
-                <div class="progress">
-                    <div class="progress-bar" style="width: {{ (event.registered / event.capacity * 100) if event.capacity else 0 }}%;"></div>
+                <div class="info-item">
+                    <span class="info-label">📍 Local</span>
+                    <span class="info-value">{{ event.location }}</span>
                 </div>
 
-                <div class="occupancy">
-                    <span>Taxa de ocupação</span>
-                    <strong>{{ "%.1f"|format((event.registered / event.capacity * 100) if event.capacity else 0) }}%</strong>
+                <div class="info-item">
+                    <span class="info-label">👥 Vagas Ocupadas</span>
+                    <span class="info-value">{{ event.registered }} / {{ event.capacity }}</span>
                 </div>
+            </div>
 
-                <!-- O ID informa à próxima rota em qual evento inscrever a pessoa. -->
-                <a href="{{ url_for('inscricao', event_id=event.id) }}" class="btn btn-primary btn-full">
-                    Inscrever participante
-                </a>
-            </aside>
+            <!-- Ações -->
+            <div class="event-actions">
+                {% if event.registered < event.capacity %}
+                    <a href="{{ url_for('inscricao', event_id=event.id) }}" class="btn btn-primary">
+                        Inscrever participante
+                    </a>
+                {% else %}
+                    <button class="btn btn-disabled" disabled>
+                        Inscrições Esgotadas
+                    </button>
+                {% endif %}
+            </div>
 
         </section>
 
 
-        <!-- Relação de participantes vinculados ao evento atual. -->
+        <!-- Lista de Participantes Inscritos -->
         <section class="participants-section">
 
-            <div class="participants-list">
-                <!-- Cria uma linha para cada participante recebido do DataManager. -->
-                {% for participant in participants %}
-                <div class="participant">
-                    <div class="avatar">
-                        <!-- Forma as iniciais usando a primeira e a última palavra do nome. -->
-                        {{ participant.name.split()[0][0] }}{{ participant.name.split()[-1][0] }}
-                    </div>
-            
-                    <div>
-                        <strong>{{ participant.name }}</strong>
-                        <span>{{ participant.major }}</span>
-                    </div>
+            <h3>Inscritos no Evento ({{ participants|length }})</h3>
+
+            {% if participants %}
+                <div class="table-container">
+                    <table class="participants-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Matrícula</th>
+                                <th>Curso / Vínculo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in participants %}
+                                <tr>
+                                    <td><strong>{{ p.name }}</strong></td>
+                                    <td><code>{{ p.registry }}</code></td>
+                                    <td>{{ p.major }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-                {% else %}
-                <!-- O else do for é executado somente quando a lista está vazia. -->
-                <p>Nenhum participante inscrito neste evento.</p>
-                {% endfor %}
-            </div>
+            {% else %}
+                <p class="empty-message">Nenhum participante inscrito até o momento.</p>
+            {% endif %}
 
         </section>
 
     </main>
 
-    <!-- Informações institucionais do sistema. -->
+
+    <!-- Rodapé institucional. -->
     <footer>
+
         <p>EventosUni © 2026</p>
-        <span>Sistema de eventos acadêmicos</span>
+
+        <span>
+            Sistema de eventos acadêmicos
+        </span>
+
     </footer>
 
 </body>

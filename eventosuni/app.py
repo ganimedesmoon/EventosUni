@@ -1,44 +1,47 @@
-"""Rotas web da aplicação EventosUni.
+"""
+Aplicação Principal EventosUni (Rotas Flask)
+--------------------------------------------
+Este módulo atua como o controlador principal da aplicação web.
+Integra as requisições HTTP às regras de negócio, manipulando os dados através
+do DataManager e aplicando as validações dos diferentes paradigmas.
 
-Este módulo liga o navegador às regras do sistema. Cada função decorada com
-``@app.route`` responde a um endereço da aplicação, consulta ou altera os dados
-por meio do ``DataManager`` e escolhe qual página HTML será apresentada.
+Paradigmas integrados:
+- OO: Flask, instâncias de Event e Participante.
+- Lógico: Invocação de 'possui_matricula_valida_e_ativa' e 'eh_elegivel'.
+- Funcional: Invocação de 'gerar_relatorio_geral_funcional'.
+- Imperativo: Controle de fluxo das rotas e requisições HTTP.
 """
 
 from datetime import datetime
-
 from flask import Flask, render_template, abort, redirect, request, url_for
+
 from data import DataManager
+from models.participant import Participante
+from rules import eh_elegivel
+from reports import gerar_relatorio_geral_funcional
 
 
 app = Flask(__name__)
 
-# ORIENTAÇÃO A OBJETOS:
-# ``app`` é um objeto criado a partir da classe Flask. As rotas também usam os
-# métodos estáticos da classe DataManager e trabalham com objetos Event.
 
-
+# ------------------------------------------------------------------------------
+# ROTA 1: PÁGINA INICIAL (INDEX)
+# ------------------------------------------------------------------------------
 @app.route('/')
 def index():
-    """Exibe a página inicial com todos os eventos cadastrados."""
-
+    """Exibe a lista de eventos cadastrados no sistema."""
     return render_template('index.html', events=DataManager.get_events())
 
 
+# ------------------------------------------------------------------------------
+# ROTA 2: CADASTRO DE EVENTOS
+# ------------------------------------------------------------------------------
 @app.route('/cadastrar', methods=['GET', 'POST'])
 def cadastrar():
-    """Mostra o formulário e processa o cadastro de um novo evento.
-
-    Uma requisição GET apenas abre a página. Uma requisição POST acontece
-    quando o formulário é enviado e traz os valores digitados pelo usuário.
     """
-
-    # PROGRAMAÇÃO IMPERATIVA:
-    # A rota segue uma sequência de ações: lê os campos, converte valores,
-    # verifica condições, altera os dados e decide qual resposta devolver.
+    Mostra o formulário (GET) e processa a criação de um novo evento (POST).
+    """
     if request.method == 'POST':
-        # ``get`` evita erro caso um campo não venha no formulário. ``strip``
-        # remove espaços extras no início e no fim dos textos digitados.
         title = request.form.get('nome', '').strip()
         date_value = request.form.get('data', '').strip()
         event_type = request.form.get('tipo', '').strip()
@@ -46,29 +49,19 @@ def cadastrar():
         capacity_value = request.form.get('vagas', '').strip()
         description = request.form.get('descricao', '').strip()
 
-        # O navegador envia a data como AAAA-MM-DD e os números como texto.
-        # A conversão confirma que esses dois campos possuem formatos válidos.
         try:
             event_date = datetime.strptime(date_value, '%Y-%m-%d')
             capacity = int(capacity_value)
         except ValueError:
-            # O código HTTP 400 informa que os dados enviados são inválidos.
-            return render_template('cadastro_evento.html'), 400
+            return render_template('cadastro_evento.html', error="Data ou número de vagas inválido."), 400
 
-        # Além do formato, os campos obrigatórios precisam estar preenchidos e
-        # a capacidade deve permitir pelo menos uma inscrição.
         if not title or not event_type or not location or not description or capacity < 1:
-            return render_template('cadastro_evento.html'), 400
+            return render_template('cadastro_evento.html', error="Preencha todos os campos obrigatórios."), 400
 
-        # As abreviações em português são usadas nos cartões da página inicial.
-        # PROGRAMAÇÃO FUNCIONAL:
-        # A tupla é imutável e as chamadas strip, upper e strftime transformam
-        # valores em novos valores sem modificar os textos originais. A rota
-        # inteira, porém, não é pura, pois lê a requisição e cadastra um evento.
+        # Mapeamento imutável dos meses (Paradigma Funcional)
         months = ('JAN', 'FEV', 'MAR', 'ABR', 'MAI', 'JUN',
                   'JUL', 'AGO', 'SET', 'OUT', 'NOV', 'DEZ')
 
-        # O DataManager centraliza a alteração do banco de dados simulado.
         event = DataManager.add_event(
             day=event_date.strftime('%d'),
             month=months[event_date.month - 1],
@@ -80,63 +73,104 @@ def cadastrar():
             description=description,
         )
 
-        # Após cadastrar, o navegador é enviado para os detalhes do novo evento.
         return redirect(url_for('evento', event_id=event.id))
 
-    # Se a requisição não for POST, basta abrir o formulário vazio.
     return render_template('cadastro_evento.html')
 
 
+# ------------------------------------------------------------------------------
+# ROTA 3: DETALHES DO EVENTO
+# ------------------------------------------------------------------------------
 @app.route('/evento/<int:event_id>', methods=['GET'])
 def evento(event_id):
-    """Exibe os detalhes de um evento e sua lista de participantes."""
-
-    # IMPERATIVA + ORIENTAÇÃO A OBJETOS:
-    # As chamadas acontecem em ordem e pedem que a classe DataManager consulte
-    # os objetos necessários antes que a página possa ser montada.
+    """Exibe as informações do evento e os seus participantes inscritos."""
     event = DataManager.get_event_by_id(event_id)
     participants = DataManager.get_participants_of_event(event_id)
 
-    # Interrompe com "não encontrado" quando não existe evento com esse ID.
     if event is None:
         abort(404)
 
     return render_template('evento.html', event=event, participants=participants)
 
 
+# ------------------------------------------------------------------------------
+# ROTA 4: INSCRIÇÃO DE PARTICIPANTE
+# ------------------------------------------------------------------------------
 @app.route('/inscricao/<int:event_id>', methods=['GET', 'POST'])
 def inscricao(event_id):
-    """Mostra o formulário e registra um participante no evento escolhido."""
-
+    """
+    Mostra o formulário de inscrição (GET) e processa a validação e cadastro (POST).
+    Aplica as regras do Paradigma Lógico para validar a matrícula e verificar elegibilidade.
+    """
     event = DataManager.get_event_by_id(event_id)
     if event is None:
         abort(404)
 
-    # PROGRAMAÇÃO IMPERATIVA:
-    # O if controla o caminho executado, e add_participant produz uma alteração
-    # no banco simulado quando os dados são válidos e existe vaga.
     if request.method == 'POST':
-        # Coleta e limpa os três campos recebidos do formulário de inscrição.
         name = request.form.get('nome', '').strip()
+        vinculo = request.form.get('vinculo', '').strip().lower()
+        idade_value = request.form.get('idade', '').strip()
         registry = request.form.get('matricula', '').strip()
-        major = request.form.get('curso', '').strip()
+        curso = request.form.get('curso', '').strip()
 
-        # A matrícula só é aceita quando contém exclusivamente números.
-        if not name or not registry.isdigit() or not major:
-            return render_template('inscricao.html', event=event), 400
+        # Campos sempre obrigatórios: nome, vínculo e idade.
+        # A matrícula só é obrigatória para estudantes e professores;
+        # a comunidade externa se inscreve sem ela (Regra Lógica 2).
+        if not name or not vinculo or not idade_value:
+            return render_template('inscricao.html', event=event, error="Preencha todos os campos obrigatórios."), 400
 
-        # O método também pode recusar a inscrição quando não há mais vagas.
-        if not DataManager.add_participant(event_id, name, int(registry), major):
-            # O código 409 indica conflito entre o pedido e o estado do evento.
-            return render_template('inscricao.html', event=event), 409
+        if vinculo in ("estudante", "professor") and not registry:
+            return render_template('inscricao.html', event=event, error="Informe a matrícula para se inscrever como estudante ou professor."), 400
 
-        # Reabrir a página do evento permite ver o participante recém-inserido.
+        try:
+            idade = int(idade_value)
+        except ValueError:
+            return render_template('inscricao.html', event=event, error="Informe uma idade válida."), 400
+
+        # Instanciação do objeto Participante (Orientação a Objetos)
+        # Observação: o model Participante não possui campo de curso — o
+        # vínculo (estudante/professor/comunidade) é o que alimenta as regras
+        # lógicas de elegibilidade; "curso" é apenas informativo no formulário.
+        participante = Participante(
+            nome=name,
+            idade=idade,
+            vinculo=vinculo,
+            matricula=registry or None,
+        )
+
+        # PARADIGMA LÓGICO: Elegibilidade combina idade mínima com a regra do
+        # vínculo (matrícula ativa para estudante/professor, ou comunidade sem matrícula).
+        if not eh_elegivel(participante):
+            if vinculo == "comunidade":
+                mensagem_erro = "Inscrição não permitida: idade mínima de 18 anos não atendida."
+            else:
+                mensagem_erro = "Matrícula inválida ou inativa na base da instituição."
+            return render_template('inscricao.html', event=event, error=mensagem_erro), 400
+
+        # PARADIGMA IMPERATIVO: Adição do participante com controlo de lotação
+        sucesso = DataManager.add_participant(event_id=event_id, participant=participante)
+
+        if not sucesso:
+            return render_template('inscricao.html', event=event, error="Inscrição não realizada: as vagas para este evento já se esgotaram."), 409
+
         return redirect(url_for('evento', event_id=event_id))
 
     return render_template('inscricao.html', event=event)
 
 
+# ------------------------------------------------------------------------------
+# ROTA 5: RELATÓRIOS ANALÍTICOS
+# ------------------------------------------------------------------------------
+@app.route('/relatorios', methods=['GET'])
+def relatorios():
+    """
+    PARADIGMA FUNCIONAL:
+    Gera o relatório de ocupação dos eventos usando transformações puras (map/filter).
+    """
+    eventos = DataManager.get_events()
+    relatorio = gerar_relatorio_geral_funcional(eventos)
+    return render_template('relatorios.html', relatorio=relatorio)
+
+
 if __name__ == '__main__':
-    # Este bloco só roda quando o arquivo é iniciado diretamente. O modo debug
-    # reinicia o servidor após alterações e mostra erros durante o desenvolvimento.
     app.run(debug=True)
