@@ -1,10 +1,12 @@
-"""Modelos de dados usados pelo EventosUni.
-
-Os modelos descrevem quais informações formam um evento e um participante.
-Separá-los dos demais arquivos facilita entender e reutilizar essas estruturas.
+"""
+Pacote Models
+-------------
+Módulo de inicialização da camada de modelos.
+Disponibiliza as entidades principais (Event e Participante) para facilitar 
+a importação direta a partir do pacote 'models'.
 """
 
-# PARADIGMAS NESTE ARQUIVO
-# Não existem instruções imperativas, funções de estilo funcional ou classes
-# declaradas diretamente aqui. O arquivo apenas reúne o pacote onde as classes
-# Event e Participant, ambas orientadas a objetos, estão organizadas.
+from models.event import Event
+from models.participant import Participante
+
+__all__ = ["Event", "Participante"]

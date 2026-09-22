@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<!--
+    Página de Relatórios Analíticos do EventosUni.
+    Renderiza os dados processados pelo Paradigma Funcional no módulo 'reports.py'
+    (taxas de ocupação, total de inscritos, média de ocupação e status dos eventos).
+-->
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatórios - EventosUni</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <!-- Cabeçalho de identificação do sistema. -->
+    <header class="header">
+        <div class="container header-content">
+
+            <div class="logo">
+                <span class="logo-icon">E</span>
+
+                <div>
+                    <h1>EventosUni</h1>
+                    <p>Eventos acadêmicos</p>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+
+    <main class="container">
+
+        <!-- Voltar para a página principal -->
+        <a href="{{ url_for('index') }}" class="back-link">
+            ← Voltar para a página inicial
+        </a>
+
+
+        <!-- Seção de Cabeçalho do Relatório -->
+        <section class="form-header">
+            <span class="event-type">ANÁLISE E MÉTRICAS</span>
+            <h2>Relatório de Ocupação de Eventos</h2>
+            <p>Visão geral consolidada do desempenho e adesão aos eventos acadêmicos.</p>
+        </section>
+
+
+        <!-- Cards de Métricas Consolidadas (Processamento Funcional) -->
+        <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 24px 0;">
+            
+            <div class="metric-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; text-align: center;">
+                <span style="font-size: 0.875rem; color: #64748b; font-weight: 500;">Total de Eventos</span>
+                <h3 style="font-size: 1.875rem; color: #0f172a; margin-top: 8px;">{{ relatorio.total_eventos }}</h3>
+            </div>
+
+            <div class="metric-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; text-align: center;">
+                <span style="font-size: 0.875rem; color: #64748b; font-weight: 500;">Total de Inscrições</span>
+                <h3 style="font-size: 1.875rem; color: #0f172a; margin-top: 8px;">{{ relatorio.total_inscritos }} / {{ relatorio.total_vagas }}</h3>
+            </div>
+
+            <div class="metric-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; text-align: center;">
+                <span style="font-size: 0.875rem; color: #64748b; font-weight: 500;">Média de Ocupação</span>
+                <h3 style="font-size: 1.875rem; color: #2563eb; margin-top: 8px;">{{ relatorio.media_ocupacao }}%</h3>
+            </div>
+
+            <div class="metric-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px; text-align: center;">
+                <span style="font-size: 0.875rem; color: #64748b; font-weight: 500;">Eventos Lotados</span>
+                <h3 style="font-size: 1.875rem; color: #dc2626; margin-top: 8px;">{{ relatorio.eventos_lotados }}</h3>
+            </div>
+
+        </div>
+
+
+        <!-- Tabela Detalhada por Evento -->
+        <section class="participants-section" style="margin-top: 32px;">
+
+            <h3>Detalhamento por Evento</h3>
+
+            {% if relatorio.resumos %}
+                <div class="table-container">
+                    <table class="participants-table">
+                        <thead>
+                            <tr>
+                                <th>Evento</th>
+                                <th>Tipo</th>
+                                <th>Data</th>
+                                <th>Inscritos / Vagas</th>
+                                <th>Taxa de Ocupação</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in relatorio.resumos %}
+                                <tr>
+                                    <td><strong>{{ r.titulo }}</strong></td>
+                                    <td><span class="event-type" style="font-size: 0.75rem;">{{ r.tipo }}</span></td>
+                                    <td>{{ r.data }}</td>
+                                    <td>{{ r.inscritos }} / {{ r.capacidade }}</td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span>{{ r.taxa_ocupacao }}%</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if r.taxa_ocupacao >= 100.0 %}
+                                            <span style="background-color: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">Lotado</span>
+                                        {% elif r.taxa_ocupacao >= 70.0 %}
+                                            <span style="background-color: #fef3c7; color: #92400e; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">Alta Procura</span>
+                                        {% else %}
+                                            <span style="background-color: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600;">Vagas Disponíveis</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="empty-message">Nenhum evento registrado para exibição no relatório.</p>
+            {% endif %}
+
+        </section>
+
+    </main>
+
+
+    <!-- Rodapé institucional. -->
+    <footer>
+
+        <p>EventosUni © 2026</p>
+
+        <span>
+            Sistema de eventos acadêmicos
+        </span>
+
+    </footer>
+
+</body>
+
+</html>

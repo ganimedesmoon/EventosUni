@@ -1,41 +1,47 @@
-"""Estrutura que representa um evento acadêmico no sistema."""
+"""
+Módulo do Evento (Model) - Paradigma Orientado a Objetos (OO)
+-----------------------------------------------------------
+Representa a entidade 'Evento' no sistema. Encapsula as informações
+de identificação, capacidade e a lista de participantes inscritos.
+"""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List
+from models.participant import Participante
 
 
-# ORIENTAÇÃO A OBJETOS:
-# Event é uma classe: ela define um modelo comum para criar objetos que possuem
-# dados de um evento. Cada evento criado é uma instância independente da classe.
 @dataclass
 class Event:
-    """Reúne todos os dados necessários para exibir e controlar um evento.
-
-    O decorador ``@dataclass`` cria automaticamente tarefas repetitivas, como
-    o método construtor. Assim, basta declarar abaixo os campos que todo evento
-    deve possuir.
-
-    ``day``, ``month`` e ``date`` guardam formatos diferentes da mesma data
-    porque as telas exibem essa informação de maneiras diferentes. Já
-    ``registered`` e ``capacity`` permitem calcular quantas vagas ainda restam.
     """
-
+    PARADIGMA ORIENTADO A OBJETOS:
+    Classe que molda os atributos e comportamentos de um evento acadêmico.
+    """
     id: int
     day: str
     month: str
     date: str
-    type: str
+    event_type: str
     title: str
     location: str
-    registered: int
     capacity: int
     description: str
+    inscritos: List[Participante] = field(default_factory=list)
 
+    # --------------------------------------------------------------------------
+    # MÉTODOS E PROPRIEDADES OO DE ENCAPSULAMENTO E COMPATIBILIDADE
+    # --------------------------------------------------------------------------
+    @property
+    def registered(self) -> int:
+        """
+        Propriedade calculada que retorna a contagem atual de inscritos.
+        Exigida pelos templates Jinja2 para exibir o progresso de lotação.
+        """
+        return len(self.inscritos)
 
-# IMPERATIVA:
-# Não há comandos que alterem dados neste arquivo. Entretanto, Event não usa
-# ``frozen=True`` e, por isso, seus objetos são mutáveis. A alteração imperativa
-# de ``event.registered`` ocorre mais tarde, dentro de data.py.
+    @property
+    def vagas_totais(self) -> int:
+        """Propriedade auxiliar para os cálculos do módulo de relatórios."""
+        return self.capacity
 
-# FUNCIONAL:
-# Este arquivo não implementa funções puras ou transformações de coleções. Ele
-# serve principalmente como exemplo de modelagem orientada a objetos.
+    def __repr__(self) -> str:
+        return f"Event(id={self.id}, title='{self.title}', capacity={self.capacity})"

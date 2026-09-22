@@ -154,7 +154,7 @@ button {
 }
 
 .btn-primary:hover {
-    background: #004372;
+    background: #002d4d;
 }
 
 .btn-disabled {
@@ -443,62 +443,66 @@ button {
 
 
 /* ================================
-   PARTICIPANTS
+   PARTICIPANTS & TABELAS (NOVO)
 ================================ */
 
-/* Lista de pessoas inscritas, apresentada abaixo dos detalhes do evento. */
+/* Lista e tabela de pessoas inscritas e relatórios. */
 
 .participants-section {
     margin: 45px 0 70px;
 }
 
-.participants-list {
-    /* Se houver muitos nomes, apenas esta caixa ganha rolagem vertical. */
-    background: white;
+/* Container do "quadrado" branco com bordas arredondadas e rolagem interna */
+.table-container {
+    background: #ffffff;
     border: 1px solid #e4e8ef;
     border-radius: 12px;
-    overflow: hidden;
-    max-height: 400px;
-    overflow-y: auto;
-    padding-right: 8px;
+    box-shadow: 0 3px 12px rgba(20, 30, 50, 0.04);
+    max-height: 400px; /* Garante a rolagem vertical em até 400px */
+    overflow-y: auto;  /* Ativa a barra de rolagem interna */
+    padding: 0;
+    margin-top: 16px;
 }
 
-.participant {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 16px 20px;
+.participants-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.participants-table th {
+    position: sticky;
+    top: 0;
+    background-color: #f8fafc;
+    padding: 14px 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+    z-index: 10;
+}
+
+.participants-table td {
+    padding: 14px 20px;
+    font-size: 0.95rem;
+    color: #1e293b;
     border-bottom: 1px solid #edf0f4;
 }
 
-.participant:last-child {
+.participants-table tbody tr:last-child td {
     border-bottom: none;
 }
 
-.avatar {
-    /* Círculo que recebe as iniciais calculadas pelo template evento.html. */
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: #eaf1ff;
-    color: #cb6005;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: bold;
+.participants-table tbody tr:hover {
+    background-color: #f8fafc;
 }
 
-.participant strong {
-    display: block;
+.empty-message {
+    color: #697386;
     font-size: 14px;
-}
-
-.participant span {
-    display: block;
-    margin-top: 2px;
-    color: #7b8496;
-    font-size: 12px;
+    margin-top: 15px;
 }
 
 

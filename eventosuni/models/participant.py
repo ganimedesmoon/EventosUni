@@ -1,30 +1,49 @@
-"""Estrutura que representa uma pessoa inscrita em um evento."""
+"""
+Módulo do Participante (Model) - Paradigma Orientado a Objetos (OO)
+------------------------------------------------------------------
+Representa a pessoa inscrita em um evento acadêmico.
+- OO: Estrutura base de dados com métodos e propriedades para encapsulamento.
+- Imutabilidade (Funcional): O parâmetro frozen=True garante imutabilidade
+  dos dados cadastrais após a instância ser criada.
+"""
 
 from dataclasses import dataclass
 
 
-# ORIENTAÇÃO A OBJETOS:
-# Participant é uma classe usada como molde para todos os participantes. Cada
-# pessoa inscrita é representada por um objeto criado a partir deste molde.
 @dataclass(frozen=True)
-class Participant:
-    """Guarda os dados acadêmicos básicos de um participante.
-
-    ``frozen=True`` torna o objeto imutável: depois que um participante é
-    criado, nome, matrícula e curso não podem ser trocados por acidente. Para
-    corrigir alguma informação seria necessário criar um novo participante.
+class Participante:
     """
+    PARADIGMA ORIENTADO A OBJETOS:
+    Classe imutável que representa um participante no sistema.
+    """
+    nome: str
+    idade: int
+    vinculo: str               # "estudante", "professor" ou "comunidade"
+    matricula: str = None      # Matrícula institucional (ex: "10002001")
+    matriculado: bool = True   # Status do vínculo: True (Ativo) ou False (Inativo/Trancado)
 
-    name: str
-    registry: int
-    major: str
+    def __post_init__(self):
+        """Padroniza o vínculo para minúsculas sem violar a imutabilidade do frozen dataclass."""
+        if self.vinculo:
+            object.__setattr__(self, "vinculo", self.vinculo.lower().strip())
 
+    # --------------------------------------------------------------------------
+    # PROPRIEDADES DE ENCAPSULAMENTO / COMPATIBILIDADE COM OS TEMPLATES HTML
+    # --------------------------------------------------------------------------
+    @property
+    def name(self) -> str:
+        """Retorna o nome completo para renderização no template evento.html."""
+        return self.nome
 
-# FUNCIONAL:
-# ``frozen=True`` aplica a ideia de imutabilidade, muito valorizada na
-# programação funcional. Um objeto Participant não muda depois de criado,
-# reduzindo alterações inesperadas no estado do programa.
+    @property
+    def registry(self) -> str:
+        """Retorna a matrícula formatada para o template evento.html."""
+        return self.matricula if self.matricula else "Sem Matrícula"
 
-# IMPERATIVA:
-# Não existem instruções sequenciais que alterem estado neste arquivo. A lista
-# que guarda estes objetos é modificada de forma imperativa em data.py.
+    @property
+    def major(self) -> str:
+        """Retorna o curso/vínculo formatado com a primeira letra maiúscula."""
+        return self.vinculo.capitalize() if self.vinculo else "Geral"
+
+    def __repr__(self) -> str:
+        return f"Participante({self.nome}, vinculo='{self.vinculo}', matricula='{self.matricula}')"
